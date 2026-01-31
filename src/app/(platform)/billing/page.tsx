@@ -146,21 +146,28 @@ export default function BillingPage() {
                 </Button>
               </div>
 
-              <Table>
-                <THead>
-                  <TR>
-                    <TH>Item</TH>
-                    <TH className="w-[90px]">Qty</TH>
-                    <TH className="w-[130px]">Rate</TH>
-                    <TH className="w-[120px]">Discount</TH>
-                    <TH className="w-[140px]">Amount</TH>
-                    <TH className="w-[60px]"></TH>
-                  </TR>
-                </THead>
-                <tbody>
-                  {lines.map((l, idx) => (
-                    <TR key={`${l.itemId}-${idx}`}>
-                      <TD>
+              {/* Mobile: line items as cards */}
+              <div className="grid gap-3 md:hidden">
+                {lines.map((l, idx) => (
+                  <div
+                    key={`${l.itemId}-${idx}`}
+                    className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="text-sm font-semibold">Line {idx + 1}</div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setLines((s) => s.filter((_, i) => i !== idx))}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                    <div className="mt-3 grid gap-3">
+                      <div>
+                        <div className="mb-1 text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                          Item
+                        </div>
                         <Select
                           value={l.itemId}
                           onChange={(e) => {
@@ -186,57 +193,172 @@ export default function BillingPage() {
                             </option>
                           ))}
                         </Select>
-                      </TD>
-                      <TD>
-                        <Input
-                          type="number"
-                          value={l.qty}
-                          onChange={(e) => {
-                            const qty = Math.max(1, Number(e.target.value || 1));
-                            setLines((s) => s.map((x, i) => (i === idx ? { ...x, qty } : x)));
-                          }}
-                        />
-                      </TD>
-                      <TD>
-                        <Input
-                          type="number"
-                          value={l.unitPrice}
-                          onChange={(e) => {
-                            const unitPrice = Math.max(0, Number(e.target.value || 0));
-                            setLines((s) =>
-                              s.map((x, i) => (i === idx ? { ...x, unitPrice } : x)),
-                            );
-                          }}
-                        />
-                      </TD>
-                      <TD>
-                        <Input
-                          type="number"
-                          value={l.discount}
-                          onChange={(e) => {
-                            const discount = Math.max(0, Number(e.target.value || 0));
-                            setLines((s) =>
-                              s.map((x, i) => (i === idx ? { ...x, discount } : x)),
-                            );
-                          }}
-                        />
-                      </TD>
-                      <TD className="font-medium">
-                        {formatINR(l.qty * l.unitPrice - l.discount)}
-                      </TD>
-                      <TD>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setLines((s) => s.filter((_, i) => i !== idx))}
-                        >
-                          ✕
-                        </Button>
-                      </TD>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <div className="mb-1 text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                            Qty
+                          </div>
+                          <Input
+                            type="number"
+                            value={l.qty}
+                            onChange={(e) => {
+                              const qty = Math.max(1, Number(e.target.value || 1));
+                              setLines((s) =>
+                                s.map((x, i) => (i === idx ? { ...x, qty } : x)),
+                              );
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <div className="mb-1 text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                            Rate
+                          </div>
+                          <Input
+                            type="number"
+                            value={l.unitPrice}
+                            onChange={(e) => {
+                              const unitPrice = Math.max(0, Number(e.target.value || 0));
+                              setLines((s) =>
+                                s.map((x, i) =>
+                                  i === idx ? { ...x, unitPrice } : x,
+                                ),
+                              );
+                            }}
+                          />
+                        </div>
+                        <div className="col-span-2">
+                          <div className="mb-1 text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                            Discount
+                          </div>
+                          <Input
+                            type="number"
+                            value={l.discount}
+                            onChange={(e) => {
+                              const discount = Math.max(0, Number(e.target.value || 0));
+                              setLines((s) =>
+                                s.map((x, i) =>
+                                  i === idx ? { ...x, discount } : x,
+                                ),
+                              );
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between rounded-xl bg-zinc-50 px-3 py-2 text-sm dark:bg-zinc-900">
+                        <div className="text-zinc-600 dark:text-zinc-300">Amount</div>
+                        <div className="font-semibold">
+                          {formatINR(l.qty * l.unitPrice - l.discount)}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop: table */}
+              <div className="hidden md:block">
+                <Table>
+                  <THead>
+                    <TR>
+                      <TH>Item</TH>
+                      <TH className="w-[90px]">Qty</TH>
+                      <TH className="w-[130px]">Rate</TH>
+                      <TH className="w-[120px]">Discount</TH>
+                      <TH className="w-[140px]">Amount</TH>
+                      <TH className="w-[60px]"></TH>
                     </TR>
-                  ))}
-                </tbody>
-              </Table>
+                  </THead>
+                  <tbody>
+                    {lines.map((l, idx) => (
+                      <TR key={`${l.itemId}-${idx}`}
+                      >
+                        <TD>
+                          <Select
+                            value={l.itemId}
+                            onChange={(e) => {
+                              const item = items.find((it) => it.id === e.target.value);
+                              if (!item) return;
+                              setLines((s) =>
+                                s.map((x, i) =>
+                                  i === idx
+                                    ? {
+                                        ...x,
+                                        itemId: item.id,
+                                        itemName: item.name,
+                                        unitPrice: item.sellingPrice,
+                                      }
+                                    : x,
+                                ),
+                              );
+                            }}
+                          >
+                            {items.map((it) => (
+                              <option key={it.id} value={it.id}>
+                                {it.name}
+                              </option>
+                            ))}
+                          </Select>
+                        </TD>
+                        <TD>
+                          <Input
+                            type="number"
+                            value={l.qty}
+                            onChange={(e) => {
+                              const qty = Math.max(1, Number(e.target.value || 1));
+                              setLines((s) =>
+                                s.map((x, i) => (i === idx ? { ...x, qty } : x)),
+                              );
+                            }}
+                          />
+                        </TD>
+                        <TD>
+                          <Input
+                            type="number"
+                            value={l.unitPrice}
+                            onChange={(e) => {
+                              const unitPrice = Math.max(0, Number(e.target.value || 0));
+                              setLines((s) =>
+                                s.map((x, i) =>
+                                  i === idx ? { ...x, unitPrice } : x,
+                                ),
+                              );
+                            }}
+                          />
+                        </TD>
+                        <TD>
+                          <Input
+                            type="number"
+                            value={l.discount}
+                            onChange={(e) => {
+                              const discount = Math.max(0, Number(e.target.value || 0));
+                              setLines((s) =>
+                                s.map((x, i) =>
+                                  i === idx ? { ...x, discount } : x,
+                                ),
+                              );
+                            }}
+                          />
+                        </TD>
+                        <TD className="font-medium">
+                          {formatINR(l.qty * l.unitPrice - l.discount)}
+                        </TD>
+                        <TD>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setLines((s) => s.filter((_, i) => i !== idx))}
+                          >
+                            ✕
+                          </Button>
+                        </TD>
+                      </TR>
+                    ))}
+                  </tbody>
+                </Table>
+              </div>
 
               {!lines.length ? (
                 <div className="mt-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300">
@@ -290,59 +412,117 @@ export default function BillingPage() {
           </CardHeader>
           <CardContent>
             {recentInvoices.length ? (
-              <Table>
-                <THead>
-                  <TR>
-                    <TH>Invoice</TH>
-                    <TH>Total</TH>
-                    <TH>Status</TH>
-                    <TH className="text-right">Actions</TH>
-                  </TR>
-                </THead>
-                <tbody>
+              <>
+                {/* Mobile: cards */}
+                <div className="grid gap-3 md:hidden">
                   {recentInvoices.map((inv) => (
-                    <TR key={inv.id}>
-                      <TD>
-                        <Link
-                          href={`/invoices/${inv.id}`}
-                          className="font-medium text-indigo-600 hover:underline dark:text-indigo-300"
-                        >
-                          {inv.invoiceNo}
-                        </Link>
-                        <div className="text-xs text-zinc-500 dark:text-zinc-400">
-                          {format(new Date(inv.createdAt), "dd MMM, HH:mm")} • {inv.customerName}
+                    <div
+                      key={inv.id}
+                      className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <Link
+                            href={`/invoices/${inv.id}`}
+                            className="font-semibold text-indigo-600 hover:underline dark:text-indigo-300"
+                          >
+                            {inv.invoiceNo}
+                          </Link>
+                          <div className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                            {format(new Date(inv.createdAt), "dd MMM, HH:mm")}
+                          </div>
                         </div>
-                      </TD>
-                      <TD className="font-semibold">{formatINR(inv.total)}</TD>
-                      <TD>
                         {inv.paid ? (
                           <Badge variant="success">Paid</Badge>
                         ) : (
                           <Badge variant="warning">Unpaid</Badge>
                         )}
-                      </TD>
-                      <TD className="text-right">
-                        <div className="inline-flex items-center gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => toggleInvoicePaid(inv.id)}
-                          >
-                            Toggle
-                          </Button>
-                          <Link
-                            href={`/invoices/${inv.id}`}
-                            className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-900"
-                          >
-                            <Printer className="h-4 w-4" />
-                            Print
-                          </Link>
-                        </div>
-                      </TD>
-                    </TR>
+                      </div>
+                      <div className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
+                        {inv.customerName}
+                      </div>
+                      <div className="mt-2 flex items-center justify-between rounded-xl bg-zinc-50 px-3 py-2 text-sm dark:bg-zinc-900">
+                        <div className="text-zinc-600 dark:text-zinc-300">Total</div>
+                        <div className="font-semibold">{formatINR(inv.total)}</div>
+                      </div>
+                      <div className="mt-3 flex gap-2">
+                        <Button
+                          className="flex-1"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => toggleInvoicePaid(inv.id)}
+                        >
+                          Toggle Paid
+                        </Button>
+                        <Link
+                          href={`/invoices/${inv.id}`}
+                          className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-900"
+                        >
+                          <Printer className="h-4 w-4" />
+                          Print
+                        </Link>
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </Table>
+                </div>
+
+                {/* Desktop: table */}
+                <div className="hidden md:block">
+                  <Table>
+                    <THead>
+                      <TR>
+                        <TH>Invoice</TH>
+                        <TH>Total</TH>
+                        <TH>Status</TH>
+                        <TH className="text-right">Actions</TH>
+                      </TR>
+                    </THead>
+                    <tbody>
+                      {recentInvoices.map((inv) => (
+                        <TR key={inv.id}>
+                          <TD>
+                            <Link
+                              href={`/invoices/${inv.id}`}
+                              className="font-medium text-indigo-600 hover:underline dark:text-indigo-300"
+                            >
+                              {inv.invoiceNo}
+                            </Link>
+                            <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                              {format(new Date(inv.createdAt), "dd MMM, HH:mm")} • {inv.customerName}
+                            </div>
+                          </TD>
+                          <TD className="font-semibold">{formatINR(inv.total)}</TD>
+                          <TD>
+                            {inv.paid ? (
+                              <Badge variant="success">Paid</Badge>
+                            ) : (
+                              <Badge variant="warning">Unpaid</Badge>
+                            )}
+                          </TD>
+                          <TD className="text-right">
+                            <div className="inline-flex items-center gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => toggleInvoicePaid(inv.id)}
+                              >
+                                Toggle
+                              </Button>
+                              <Link
+                                href={`/invoices/${inv.id}`}
+                                className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-900"
+                              >
+                                <Printer className="h-4 w-4" />
+                                Print
+                              </Link>
+                            </div>
+                          </TD>
+                        </TR>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
+              </>
             ) : (
               <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300">
                 No invoices yet.

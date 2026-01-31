@@ -114,44 +114,85 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             {lowStock.length ? (
-              <Table>
-                <THead>
-                  <TR>
-                    <TH>Item</TH>
-                    <TH>Qty</TH>
-                    <TH>Status</TH>
-                    <TH className="text-right">Action</TH>
-                  </TR>
-                </THead>
-                <tbody>
+              <>
+                {/* Mobile: cards */}
+                <div className="grid gap-3 sm:hidden">
                   {lowStock.slice(0, 6).map((i) => (
-                    <TR key={i.id}>
-                      <TD>
-                        <div className="font-medium text-zinc-900 dark:text-zinc-100">
-                          {i.name}
+                    <div
+                      key={i.id}
+                      className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="truncate font-semibold text-zinc-900 dark:text-zinc-100">
+                            {i.name}
+                          </div>
+                          <div className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                            {i.sku} • {i.brand}
+                          </div>
                         </div>
-                        <div className="text-xs text-zinc-500 dark:text-zinc-400">
-                          {i.sku} • {i.brand}
+                        <Badge variant="warning">Low</Badge>
+                      </div>
+                      <div className="mt-3 flex items-center justify-between text-sm">
+                        <div className="text-zinc-600 dark:text-zinc-300">Qty</div>
+                        <div className="font-semibold">
+                          {formatNumber(i.quantity)} {i.unit}
                         </div>
-                      </TD>
-                      <TD>
-                        {formatNumber(i.quantity)} {i.unit}
-                      </TD>
-                      <TD>
-                        <Badge variant="warning">Re-order</Badge>
-                      </TD>
-                      <TD className="text-right">
+                      </div>
+                      <div className="mt-3">
                         <Link
                           href="/stock"
-                          className="text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-300"
+                          className="inline-flex w-full items-center justify-center rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm font-semibold text-indigo-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-indigo-200 dark:hover:bg-zinc-900"
                         >
                           Receive stock
                         </Link>
-                      </TD>
-                    </TR>
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </Table>
+                </div>
+
+                {/* Desktop: table */}
+                <div className="hidden sm:block">
+                  <Table>
+                    <THead>
+                      <TR>
+                        <TH>Item</TH>
+                        <TH>Qty</TH>
+                        <TH>Status</TH>
+                        <TH className="text-right">Action</TH>
+                      </TR>
+                    </THead>
+                    <tbody>
+                      {lowStock.slice(0, 6).map((i) => (
+                        <TR key={i.id}>
+                          <TD>
+                            <div className="font-medium text-zinc-900 dark:text-zinc-100">
+                              {i.name}
+                            </div>
+                            <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                              {i.sku} • {i.brand}
+                            </div>
+                          </TD>
+                          <TD>
+                            {formatNumber(i.quantity)} {i.unit}
+                          </TD>
+                          <TD>
+                            <Badge variant="warning">Re-order</Badge>
+                          </TD>
+                          <TD className="text-right">
+                            <Link
+                              href="/stock"
+                              className="text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-300"
+                            >
+                              Receive stock
+                            </Link>
+                          </TD>
+                        </TR>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
+              </>
             ) : (
               <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300">
                 All items are above minimum stock.
@@ -168,42 +209,80 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             {recentInvoices.length ? (
-              <Table>
-                <THead>
-                  <TR>
-                    <TH>Invoice</TH>
-                    <TH>Customer</TH>
-                    <TH>Total</TH>
-                    <TH>Status</TH>
-                  </TR>
-                </THead>
-                <tbody>
+              <>
+                {/* Mobile: cards */}
+                <div className="grid gap-3 sm:hidden">
                   {recentInvoices.map((inv) => (
-                    <TR key={inv.id}>
-                      <TD>
-                        <Link
-                          href={`/invoices/${inv.id}`}
-                          className="font-medium text-indigo-600 hover:underline dark:text-indigo-300"
-                        >
-                          {inv.invoiceNo}
-                        </Link>
-                        <div className="text-xs text-zinc-500 dark:text-zinc-400">
-                          {format(new Date(inv.createdAt), "dd MMM, HH:mm")}
+                    <Link
+                      key={inv.id}
+                      href={`/invoices/${inv.id}`}
+                      className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="text-sm font-semibold text-indigo-700 dark:text-indigo-200">
+                            {inv.invoiceNo}
+                          </div>
+                          <div className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                            {format(new Date(inv.createdAt), "dd MMM, HH:mm")}
+                          </div>
                         </div>
-                      </TD>
-                      <TD>{inv.customerName}</TD>
-                      <TD>{formatINR(inv.total)}</TD>
-                      <TD>
                         {inv.paid ? (
                           <Badge variant="success">Paid</Badge>
                         ) : (
                           <Badge variant="warning">Unpaid</Badge>
                         )}
-                      </TD>
-                    </TR>
+                      </div>
+                      <div className="mt-3 text-sm">
+                        <div className="text-zinc-600 dark:text-zinc-300">
+                          {inv.customerName}
+                        </div>
+                        <div className="mt-1 font-semibold">{formatINR(inv.total)}</div>
+                      </div>
+                    </Link>
                   ))}
-                </tbody>
-              </Table>
+                </div>
+
+                {/* Desktop: table */}
+                <div className="hidden sm:block">
+                  <Table>
+                    <THead>
+                      <TR>
+                        <TH>Invoice</TH>
+                        <TH>Customer</TH>
+                        <TH>Total</TH>
+                        <TH>Status</TH>
+                      </TR>
+                    </THead>
+                    <tbody>
+                      {recentInvoices.map((inv) => (
+                        <TR key={inv.id}>
+                          <TD>
+                            <Link
+                              href={`/invoices/${inv.id}`}
+                              className="font-medium text-indigo-600 hover:underline dark:text-indigo-300"
+                            >
+                              {inv.invoiceNo}
+                            </Link>
+                            <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                              {format(new Date(inv.createdAt), "dd MMM, HH:mm")}
+                            </div>
+                          </TD>
+                          <TD>{inv.customerName}</TD>
+                          <TD>{formatINR(inv.total)}</TD>
+                          <TD>
+                            {inv.paid ? (
+                              <Badge variant="success">Paid</Badge>
+                            ) : (
+                              <Badge variant="warning">Unpaid</Badge>
+                            )}
+                          </TD>
+                        </TR>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
+              </>
             ) : (
               <div className="text-sm text-zinc-600 dark:text-zinc-300">
                 No invoices yet.
@@ -218,19 +297,21 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             {recentMovements.length ? (
-              <Table>
-                <THead>
-                  <TR>
-                    <TH>Type</TH>
-                    <TH>Item</TH>
-                    <TH>Qty</TH>
-                    <TH>When</TH>
-                  </TR>
-                </THead>
-                <tbody>
+              <>
+                {/* Mobile: cards */}
+                <div className="grid gap-3 sm:hidden">
                   {recentMovements.map((m) => (
-                    <TR key={m.id}>
-                      <TD>
+                    <div
+                      key={m.id}
+                      className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="truncate font-semibold">{m.itemName}</div>
+                          <div className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                            {format(new Date(m.createdAt), "dd MMM, HH:mm")}
+                          </div>
+                        </div>
                         <Badge
                           variant={
                             m.type === "RECEIVE"
@@ -242,18 +323,69 @@ export default function DashboardPage() {
                         >
                           {m.type}
                         </Badge>
-                      </TD>
-                      <TD>{m.itemName}</TD>
-                      <TD className={m.quantityDelta < 0 ? "text-rose-600" : "text-emerald-700"}>
-                        {m.quantityDelta}
-                      </TD>
-                      <TD className="text-xs text-zinc-500 dark:text-zinc-400">
-                        {format(new Date(m.createdAt), "dd MMM, HH:mm")}
-                      </TD>
-                    </TR>
+                      </div>
+                      <div className="mt-3 flex items-center justify-between text-sm">
+                        <div className="text-zinc-600 dark:text-zinc-300">Qty</div>
+                        <div
+                          className={
+                            m.quantityDelta < 0
+                              ? "font-semibold text-rose-600"
+                              : "font-semibold text-emerald-700"
+                          }
+                        >
+                          {m.quantityDelta}
+                        </div>
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </Table>
+                </div>
+
+                {/* Desktop: table */}
+                <div className="hidden sm:block">
+                  <Table>
+                    <THead>
+                      <TR>
+                        <TH>Type</TH>
+                        <TH>Item</TH>
+                        <TH>Qty</TH>
+                        <TH>When</TH>
+                      </TR>
+                    </THead>
+                    <tbody>
+                      {recentMovements.map((m) => (
+                        <TR key={m.id}>
+                          <TD>
+                            <Badge
+                              variant={
+                                m.type === "RECEIVE"
+                                  ? "success"
+                                  : m.type === "ISSUE"
+                                    ? "danger"
+                                    : "info"
+                              }
+                            >
+                              {m.type}
+                            </Badge>
+                          </TD>
+                          <TD>{m.itemName}</TD>
+                          <TD
+                            className={
+                              m.quantityDelta < 0
+                                ? "text-rose-600"
+                                : "text-emerald-700"
+                            }
+                          >
+                            {m.quantityDelta}
+                          </TD>
+                          <TD className="text-xs text-zinc-500 dark:text-zinc-400">
+                            {format(new Date(m.createdAt), "dd MMM, HH:mm")}
+                          </TD>
+                        </TR>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
+              </>
             ) : (
               <div className="text-sm text-zinc-600 dark:text-zinc-300">
                 No movements yet.

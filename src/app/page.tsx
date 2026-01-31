@@ -7,6 +7,7 @@ import {
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 import { ButtonLink } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -26,6 +27,7 @@ export default function Home() {
           </div>
         </Link>
         <div className="flex items-center gap-2">
+          <ThemeToggle variant="outline" size="sm" />
           <ButtonLink href="/dashboard" variant="primary">
             Open Demo <ArrowRight className="h-4 w-4" />
           </ButtonLink>

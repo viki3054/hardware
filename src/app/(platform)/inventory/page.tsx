@@ -81,79 +81,164 @@ export default function InventoryPage() {
           </div>
 
           <div className="mt-4">
-            <Table>
-              <THead>
-                <TR>
-                  <TH>Item</TH>
-                  <TH>Stock</TH>
-                  <TH>Prices</TH>
-                  <TH>Location</TH>
-                  <TH className="text-right">Actions</TH>
-                </TR>
-              </THead>
-              <tbody>
-                {filtered.map((i) => {
-                  const low = i.quantity <= i.minStock;
-                  return (
-                    <TR key={i.id}>
-                      <TD>
-                        <div className="font-medium text-zinc-900 dark:text-zinc-100">
+            {/* Mobile: card list */}
+            <div className="grid gap-3 sm:hidden">
+              {filtered.map((i) => {
+                const low = i.quantity <= i.minStock;
+                return (
+                  <div
+                    key={i.id}
+                    className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="truncate font-semibold text-zinc-900 dark:text-zinc-100">
                           {i.name}
                         </div>
-                        <div className="text-xs text-zinc-500 dark:text-zinc-400">
-                          {i.sku} • {i.brand} • {i.category}
+                        <div className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                          {i.sku} • {i.brand}
                         </div>
-                      </TD>
-                      <TD>
-                        <div className="flex items-center gap-2">
-                          <span className={low ? "font-semibold text-rose-600" : "font-semibold"}>
-                            {formatNumber(i.quantity)} {i.unit}
-                          </span>
-                          {low ? <Badge variant="warning">Low</Badge> : <Badge>OK</Badge>}
+                      </div>
+                      {low ? <Badge variant="warning">Low</Badge> : <Badge>OK</Badge>}
+                    </div>
+
+                    <div className="mt-3 grid gap-2 text-sm">
+                      <div className="flex items-center justify-between">
+                        <div className="text-zinc-600 dark:text-zinc-300">Stock</div>
+                        <div className={low ? "font-semibold text-rose-600" : "font-semibold"}>
+                          {formatNumber(i.quantity)} {i.unit}
                         </div>
-                        <div className="text-xs text-zinc-500 dark:text-zinc-400">
-                          Min {formatNumber(i.minStock)}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="text-zinc-600 dark:text-zinc-300">Min stock</div>
+                        <div className="font-medium">{formatNumber(i.minStock)}</div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="text-zinc-600 dark:text-zinc-300">Sell price</div>
+                        <div className="font-medium">{formatINR(i.sellingPrice)}</div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="text-zinc-600 dark:text-zinc-300">Location</div>
+                        <div className="max-w-[60%] truncate font-medium">
+                          {i.location}
                         </div>
-                      </TD>
-                      <TD>
-                        <div className="text-sm">
-                          <div>Sell: {formatINR(i.sellingPrice)}</div>
-                          <div className="text-xs text-zinc-500 dark:text-zinc-400">
-                            Cost: {formatINR(i.costPrice)}
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex gap-2">
+                      <Button
+                        className="flex-1"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setSelected(i);
+                          setOpenAdjust(true);
+                        }}
+                      >
+                        Adjust
+                      </Button>
+                      <Button
+                        className="flex-1"
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          updateItem(i.id, { minStock: Math.max(0, i.minStock + 5) });
+                        }}
+                      >
+                        Increase Min
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop: table */}
+            <div className="hidden sm:block">
+              <Table>
+                <THead>
+                  <TR>
+                    <TH>Item</TH>
+                    <TH>Stock</TH>
+                    <TH>Prices</TH>
+                    <TH>Location</TH>
+                    <TH className="text-right">Actions</TH>
+                  </TR>
+                </THead>
+                <tbody>
+                  {filtered.map((i) => {
+                    const low = i.quantity <= i.minStock;
+                    return (
+                      <TR key={i.id}>
+                        <TD>
+                          <div className="font-medium text-zinc-900 dark:text-zinc-100">
+                            {i.name}
                           </div>
-                        </div>
-                      </TD>
-                      <TD className="text-sm text-zinc-600 dark:text-zinc-300">
-                        {i.location}
-                      </TD>
-                      <TD className="text-right">
-                        <div className="inline-flex items-center gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => {
-                              setSelected(i);
-                              setOpenAdjust(true);
-                            }}
-                          >
-                            Adjust
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => {
-                              updateItem(i.id, { minStock: Math.max(0, i.minStock + 5) });
-                            }}
-                          >
-                            +Min
-                          </Button>
-                        </div>
-                      </TD>
-                    </TR>
-                  );
-                })}
-              </tbody>
-            </Table>
+                          <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                            {i.sku} • {i.brand} • {i.category}
+                          </div>
+                        </TD>
+                        <TD>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={
+                                low ? "font-semibold text-rose-600" : "font-semibold"
+                              }
+                            >
+                              {formatNumber(i.quantity)} {i.unit}
+                            </span>
+                            {low ? (
+                              <Badge variant="warning">Low</Badge>
+                            ) : (
+                              <Badge>OK</Badge>
+                            )}
+                          </div>
+                          <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                            Min {formatNumber(i.minStock)}
+                          </div>
+                        </TD>
+                        <TD>
+                          <div className="text-sm">
+                            <div>Sell: {formatINR(i.sellingPrice)}</div>
+                            <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                              Cost: {formatINR(i.costPrice)}
+                            </div>
+                          </div>
+                        </TD>
+                        <TD className="text-sm text-zinc-600 dark:text-zinc-300">
+                          {i.location}
+                        </TD>
+                        <TD className="text-right">
+                          <div className="inline-flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                setSelected(i);
+                                setOpenAdjust(true);
+                              }}
+                            >
+                              Adjust
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => {
+                                updateItem(i.id, {
+                                  minStock: Math.max(0, i.minStock + 5),
+                                });
+                              }}
+                            >
+                              +Min
+                            </Button>
+                          </div>
+                        </TD>
+                      </TR>
+                    );
+                  })}
+                </tbody>
+              </Table>
+            </div>
 
             {!filtered.length ? (
               <div className="mt-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300">
